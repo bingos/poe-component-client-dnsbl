@@ -1,0 +1,14 @@
+use strict;
+use inc::Module::Install;
+name 'POE-Component-Client-DNSBL';
+license 'perl';
+author 'Chris Williams <chris@bingosnet.co.uk>';
+version_from 'lib/POE/Component/Client/DNSBL.pm';
+abstract_from 'lib/POE/Component/Client/DNSBL.pm';
+perl_version '5.006';
+build_requires 'Test::More' => 0.47;
+build_requires 'Data::Dumper' => 0.47;
+requires 'Net::IP' => 0;
+requires 'POE' => 0.38;
+requires 'POE::Component::Client::DNS' => 1.00;
+WriteAll();
