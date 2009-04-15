@@ -6,7 +6,7 @@ use Net::IP qw(ip_is_ipv4);
 use POE qw(Component::Client::DNS);
 use vars qw($VERSION);
 
-$VERSION = '0.10';
+$VERSION = '1.00';
 
 sub spawn {
   my $package = shift;
@@ -244,7 +244,7 @@ zen.spamhaus.org.
 
 =over
 
-=item spawn
+=item C<spawn>
 
 Takes a number of parameters:
 
@@ -261,15 +261,15 @@ Returns an object.
 
 =over
 
-=item session_id
+=item C<session_id>
 
 Takes no arguments. Returns the ID of the component's session.
 
-=item shutdown
+=item C<shutdown>
 
 Terminates the component.
 
-=item lookup
+=item C<lookup>
 
 Performs a DNSBL lookup. Takes a number of parameters:
 
@@ -285,11 +285,11 @@ You may also pass arbitary key/values. Arbitary keys should have an underscore p
 
 =over
 
-=item shutdown
+=item C<shutdown>
 
 Terminates the component.
 
-=item lookup
+=item C<lookup>
 
 Performs a DNSBL lookup. Takes a number of parameters:
 
@@ -317,7 +317,7 @@ Chris C<BinGOs> Williams <chris@bingosnet.co.uk>
 
 =head1 LICENSE
 
-Copyright C<(c)> Chris Williamss.
+Copyright E<copy> Chris Williamss.
 
 This module may be used, modified, and distributed under the same terms as Perl itself. Please see the license that came with your Perl distribution for details.
 

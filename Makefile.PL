@@ -9,6 +9,7 @@ perl_version '5.006';
 build_requires 'Test::More' => 0.47;
 build_requires 'Data::Dumper' => 0.47;
 requires 'Net::IP' => 0;
-requires 'POE' => 0.38;
+requires 'POE' => 1.004;
 requires 'POE::Component::Client::DNS' => 1.00;
+eval "auto_set_repository";
 WriteAll();
