@@ -1,6 +1,9 @@
 POE::Component::Client::DNSBL Changelog
 =======================================
 
+1.02	Tue May 19 10:34:50 BST 2009
+	- Added postback functionality.
+
 1.00	Wed Apr 15 15:32:04 BST 2009
 	- Bump to a stable release version
 	- Tidy the POD a little

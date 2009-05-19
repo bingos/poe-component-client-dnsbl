@@ -6,7 +6,7 @@ use Net::IP qw(ip_is_ipv4);
 use POE qw(Component::Client::DNS);
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 sub spawn {
   my $package = shift;
@@ -102,7 +102,8 @@ sub _resolve {
   }
   $args->{dnsbl} ||= $self->{dnsbl};
   $args->{sender} = $sender_id;
-  $kernel->refcount_increment( $sender_id, __PACKAGE__ );
+  $kernel->refcount_increment( $sender_id, __PACKAGE__ )
+	unless ref $args->{event} eq 'POE::Session::AnonEvent';
   my $response = $self->{resolver}->resolve(
     event => '_lookup',
     host  => join( '.', ( reverse split /\./, $args->{address} ), $args->{dnsbl} ),
@@ -142,8 +143,14 @@ sub _lookup {
     }
   }
   my $sender_id = delete $args->{sender};
-  $kernel->post( $sender_id, $args->{event}, $args );
-  $kernel->refcount_decrement( $sender_id, __PACKAGE__ );
+  my $event = delete $args->{event};
+  if ( ref $event eq 'POE::Session::AnonEvent' ) {
+    $event->( $args );
+  }
+  else {
+    $kernel->post( $sender_id, $event, $args );
+    $kernel->refcount_decrement( $sender_id, __PACKAGE__ );
+  }
   return;
 }
 
@@ -279,6 +286,8 @@ Performs a DNSBL lookup. Takes a number of parameters:
 
 You may also pass arbitary key/values. Arbitary keys should have an underscore prefix '_'.
 
+C<event> may also be a L<POE::Session> postback.
+
 =back
 
 =head1 INPUT EVENTS
@@ -300,11 +309,15 @@ Performs a DNSBL lookup. Takes a number of parameters:
 
 You may also pass arbitary key/values. Arbitary keys should have an underscore prefix '_'.
 
+C<event> may also be a L<POE::Session> postback.
+
 =back
 
 =head1 OUTPUT EVENTS
 
-The component will send an event in response to C<lookup> requests. ARG0 will be a hashref containing the key/values of the original request ( including any arbitary key/values passed ).
+The component will send an event in response to C<lookup> requests. C<ARG0> will be a hashref containing the key/values of the original request ( including any arbitary key/values passed ).
+
+If a L<POE::Session> postback was specified, then the hashref will be the first parameter of the arrayref given as C<ARG1>
 
   'response', the status returned by the DNSBL, it will be NXDOMAIN if the address given was okay;
   'reason', if an address is blacklisted, this may contain the reason;
@@ -329,4 +342,8 @@ L<http://www.spamhaus.org/zen/>
 
 L<POE>
 
+L<POE::Session>
+
 L<POE::Component::Client::DNS>
+
+=cut
