@@ -19,5 +19,6 @@ README
 t/00_use.t
 t/01_lookup.t
 t/02_postback.t
+t/03_dbl.t
 t/99_pod.t
 t/99_pod_coverage.t

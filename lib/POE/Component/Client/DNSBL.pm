@@ -2,7 +2,7 @@ package POE::Component::Client::DNSBL;
 
 use strict;
 use warnings;
-use Net::IP qw(ip_is_ipv4);
+use Net::IP qw(ip_is_ipv4 ip_get_version);
 use POE qw(Component::Client::DNS);
 use vars qw($VERSION);
 
@@ -45,7 +45,7 @@ sub _start {
   $self->{session_id} = $_[SESSION]->ID();
   if ( $self->{alias} ) {
      $kernel->alias_set( $self->{alias} );
-  } 
+  }
   else {
      $kernel->refcount_increment( $self->{session_id} => __PACKAGE__ );
   }
@@ -74,7 +74,7 @@ sub _resolve {
   my $args;
   if ( ref( $_[ARG0] ) eq 'HASH' ) {
     $args = { %{ $_[ARG0] } };
-  } 
+  }
   else {
     $args = { @_[ARG0..$#_] };
   }
@@ -87,10 +87,21 @@ sub _resolve {
     warn "No 'address' specified for $state\n";
     return;
   }
-  unless ( ip_is_ipv4( $args->{address} ) ) {
-    warn "Given 'address' is not an IPv4 address\n";
-    return;
+
+  my $address = $args->{address};
+
+  if ( ip_get_version( $args->{address} ) ) {
+    unless ( ip_is_ipv4( $args->{address} ) ) {
+      warn "Given 'address' is not an IPv4 address\n";
+      return;
+    }
+    $address = reverse split /\./, $args->{address};
+    $args->{dnsbl} ||= $self->{dnsbl};
   }
+  else {
+    $args->{dnsbl} ||= 'dbl.spamhaus.org';
+  }
+
   if ( $args->{session} ) {
     if ( my $ref = $kernel->alias_resolve( $args->{session} ) ) {
 	$sender_id = $ref->ID();
@@ -106,7 +117,7 @@ sub _resolve {
 	unless ref $args->{event} eq 'POE::Session::AnonEvent';
   my $response = $self->{resolver}->resolve(
     event => '_lookup',
-    host  => join( '.', ( reverse split /\./, $args->{address} ), $args->{dnsbl} ),
+    host  => join( '.', $address, $args->{dnsbl} ),
     type  => 'A',
     context => $args,
   );
@@ -200,9 +211,9 @@ POE::Component::Client::DNSBL - A component that provides non-blocking DNSBL loo
 	package_states => [
 	    'main' => [ qw(_start _stop _response) ],
 	],
-	heap => { 
-		  addresses => [ @ARGV ], 
-		  dnsbl => $dnsbl 
+	heap => {
+		  addresses => [ @ARGV ],
+		  dnsbl => $dnsbl
 	},
   );
 
@@ -240,11 +251,11 @@ POE::Component::Client::DNSBL - A component that provides non-blocking DNSBL loo
 
 =head1 DESCRIPTION
 
-POE::Component::Client::DNSBL is a L<POE> component that provides non-blocking DNS blacklist lookups 
+POE::Component::Client::DNSBL is a L<POE> component that provides non-blocking DNS blacklist lookups
 to other components and POE sessions. It uses L<POE::Component::Client::DNS> to perform the requested
 queries.
 
-Only IPv4 lookups are supported and unless a DNSBL zone is specified the component will use 
+Only IPv4 lookups and URI/RHS lookups are supported and unless a DNSBL zone is specified the component will use
 zen.spamhaus.org.
 
 =head1 CONSTRUCTOR
@@ -281,7 +292,7 @@ Terminates the component.
 Performs a DNSBL lookup. Takes a number of parameters:
 
   'event', the name of the event to send the reply to. ( Mandatory );
-  'address', the IPv4 address to lookup ( Mandatory );
+  'address', the IPv4 address or domain to lookup ( Mandatory );
   'session', send the resultant event to an alternative session, ( default is the sender );
 
 You may also pass arbitary key/values. Arbitary keys should have an underscore prefix '_'.
@@ -303,7 +314,7 @@ Terminates the component.
 Performs a DNSBL lookup. Takes a number of parameters:
 
   'event', the name of the event to send the reply to. ( Mandatory );
-  'address', the IPv4 address to lookup ( Mandatory );
+  'address', the IPv4 address or domain to lookup ( Mandatory );
   'session', send the resultant event to an alternative session, ( default is the sender );
   'dnsbl', optionally override the configured DNSBL for this particular lookup;
 
@@ -339,6 +350,8 @@ This module may be used, modified, and distributed under the same terms as Perl 
 L<http://en.wikipedia.org/wiki/DNSBL>
 
 L<http://www.spamhaus.org/zen/>
+
+L<http://www.spamhaus.org/dbl/>
 
 L<POE>
 
