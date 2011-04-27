@@ -1,6 +1,9 @@
 POE::Component::Client::DNSBL Changelog
 =======================================
 
+1.04  Wed Apr 27 22:10:06 BST 2011
+  - Added support for domain block lists
+
 1.02	Tue May 19 10:34:50 BST 2009
 	- Added postback functionality.
 
