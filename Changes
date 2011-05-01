@@ -1,6 +1,9 @@
 POE::Component::Client::DNSBL Changelog
 =======================================
 
+1.06  Sun May  1 09:18:16 BST 2011
+  - Adjust dbl tests
+
 1.04  Wed Apr 27 22:10:06 BST 2011
   - Added support for domain block lists
 
