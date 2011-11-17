@@ -2,7 +2,7 @@ package POE::Component::Client::DNSBL;
 
 use strict;
 use warnings;
-use Net::IP qw(ip_is_ipv4 ip_get_version);
+use Net::IP::Minimal qw(ip_is_ipv4 ip_get_version);
 use POE qw(Component::Client::DNS);
 use vars qw($VERSION);
 
