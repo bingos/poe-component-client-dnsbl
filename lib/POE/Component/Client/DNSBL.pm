@@ -1,12 +1,11 @@
 package POE::Component::Client::DNSBL;
 
+#ABSTRACT: A component that provides non-blocking DNSBL lookups
+
 use strict;
 use warnings;
 use Net::IP::Minimal qw(ip_is_ipv4 ip_get_version);
 use POE qw(Component::Client::DNS);
-use vars qw($VERSION);
-
-$VERSION = '1.06';
 
 sub spawn {
   my $package = shift;
@@ -192,11 +191,9 @@ sub _reason {
 }
 
 1;
-__END__
 
-=head1 NAME
+=pod
 
-POE::Component::Client::DNSBL - A component that provides non-blocking DNSBL lookups
 
 =head1 SYNOPSIS
 
